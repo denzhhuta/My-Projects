@@ -13,7 +13,7 @@ from configuration import CONFIGURATION, ERRORS
 import time
 import schedule
 from database import *
-from keyboard import main_reply_keyboard, bot_turnoff_keyboard, database_keyboard
+from keyboard import main_reply_keyboard, bot_turnoff_keyboard, database_keyboard, db_clean_keyboard
 import sys
 from datetime import datetime
 import traceback
@@ -22,12 +22,13 @@ async def handle_bot_error(error: Exception):
     # Send a notification or take other actions
     turn_off_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     await user_announcement("turn_off", turn_off_time)
-    
+
+
 class CheckSubscriptionUserMiddleware(BaseMiddleware):
     def __init__(self):
          self.prefix = 'key_prefix'
          super(CheckSubscriptionUserMiddleware, self).__init__()
-         
+    
     async def on_process_update(self, update: types.Update, data: dict):
         if "message" in update:
             this_user = update.message.from_user
@@ -78,12 +79,74 @@ async def shut_down_handler(message: types.Message):
                            reply_markup=bot_turnoff_keyboard(),
                            parse_mode="HTML")
 
+
 @dp.message_handler(text='Переглянути БД 📄')
 async def database_decision_handler(message: types.Message):
     await bot.send_message(chat_id=message.chat.id,
                            text='<b>Меню 📃</b>',
                            reply_markup= database_keyboard(),
                            parse_mode="HTML")
+
+
+@dp.message_handler(text='Очистити БД 🗑')
+async def database_cleaner_handler(message: types.Message):
+    await bot.send_message(chat_id=message.chat.id,
+                           text="<b>Як очищаєм? 👀</b>",
+                           reply_markup=db_clean_keyboard(),
+                           parse_mode="HTML")
+    
+
+
+@dp.callback_query_handler(lambda callback_query: callback_query.data.startswith('clean_'))
+async def cleaning_final_handler(callback: types.CallbackQuery):
+    query_option = callback.data.split('_')[1]
+    messages_failed = []
+
+    if query_option == "completely":
+        count = await db_cleaner()
+        
+        if isinstance(count, list):
+            message_ids_to_delete = [item['message_id'] for item in count]
+            print("Message IDs to delete:", message_ids_to_delete)  # Debugging print
+            
+            for message_id in message_ids_to_delete:
+                try:
+                    print("Deleting message:", message_id)  # Debugging print
+                    await bot.delete_message(chat_id=callback.message.chat.id, message_id=message_id)
+                    await bot.delete_message(chat_id=callback.message.chat.id, message_id=message_id-1)
+                    await asyncio.sleep(1)
+                    print("Message deleted:", message_id)  # Debugging print
+                except Exception as e:
+                    messages_failed.append(message_id)
+                    print(f"Failed to delete message {message_id}: {e}")
+                    
+            await bot.send_message(chat_id=callback.message.chat.id,
+                                   text=f"<b>Успішно! ✅\nБуло видалено: {len(count)}\nНе видалено: {len(messages_failed)}</b>",
+                                   parse_mode="HTML")
+        
+        else:
+            await bot.send_message(chat_id=callback.from_user.id, 
+                                   text=count,
+                                   parse_mode="HTML")
+
+    elif query_option == "partially":
+        count = await db_cleaner()
+
+        if isinstance(count, list):
+            print(count)
+
+            await bot.send_message(chat_id=callback.message.chat.id, 
+                                   text=f"<b>Успішно! ✅ Всі повідомлення видалено.\nВидалено: {len(count)}</b>",
+                                   parse_mode="HTML")
+        
+        
+        else:
+             await bot.send_message(chat_id=callback.from_user.id, 
+                                   text=count,
+                                   parse_mode="HTML")
+
+        
+
 
 @dp.callback_query_handler(lambda callback_query: callback_query.data.startswith('database_'))
 async def database_final_handler(callback: types.CallbackQuery):
@@ -234,7 +297,8 @@ async def send_at_specific_time():
         current_minute = current_time.tm_min
         
         #ТУТ ВИСТАВЛЯТИ ГОДИНИ
-        specific_time = [(0,0), (0,30), (1,0), (1,30), (2,0), (2,30), (3,0), (3,30), (4,0), (4,30), (5,0), (5,30), (6,0), (6,30), (7,0), (7,30), (8,0), (8,30), (9,0), (9,30), (10,0), (10,30), (11,0), (11,30), (12,0), (12,30), (13,0), (13,30), (14,0), (14,30), (15,0), (15,30), (16,0), (16,30), (17,0), (17,30), (18,0), (18,30), (19,0), (19,30), (20,0), (20,30), (21,0), (21,30), (22,0), (22,30), (23,0), (23,30)]
+        specific_time = [(13,37), (13,38), (13,39)]
+        #specific_time = [(0,0), (0,30), (1,0), (1,30), (2,0), (2,30), (3,0), (3,30), (4,0), (4,30), (5,0), (5,30), (6,0), (6,30), (7,0), (7,30), (8,0), (8,30), (9,0), (9,30), (10,0), (10,30), (11,0), (11,30), (12,0), (12,30), (13,0), (13,30), (14,0), (14,30), (15,0), (15,30), (16,0), (16,30), (17,0), (17,30), (18,0), (18,30), (19,0), (19,30), (20,0), (20,30), (21,0), (21,30), (22,0), (22,30), (23,0), (23,30)]
         if (current_hour, current_minute) in specific_time:
             try:
                 print("Matching specific time, executing action")
