@@ -79,7 +79,31 @@ async def database_check(choice: str):
         else:
             return None
         
+
+async def db_cleaner():
+    conn = await connect_to_db()
+    async with conn.cursor() as cursor:
+        select_query = "SELECT * FROM message_schedule WHERE sent_status = 1"
+        await cursor.execute(select_query)
+        count = await cursor.fetchall()
         
+        if count:
+                try:
+                    insert_query = "DELETE FROM message_schedule WHERE sent_status = 1"
+                    await cursor.execute(insert_query)
+                    await conn.commit()
+                    
+                    return count
+                
+                except Exception as ex:
+                    print("Unknown error with function db_cleaner. Maybe there are no messages to delete. Check Database manually!")
+        
+        else:
+            return "<b>😔 Помилка! Мабудь, нічого видаляти?</b>"
+    
+    conn.close()
+                
+      
 async def user_announcement(announcement_type: str, time: str, error_message: str):
     if announcement_type == "turn_off":
         message = f'''
