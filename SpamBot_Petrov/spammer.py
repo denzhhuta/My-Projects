@@ -5,6 +5,8 @@ from telethon.tl.types import PeerChannel
 from telethon.tl import types
 from addition import logs_handler, send_telegram_announcement
 from telethon.tl.functions.channels import JoinChannelRequest
+from telethon.tl.functions.account import UpdateProfileRequest
+from telethon.errors.rpcerrorlist import PhoneNumberBannedError
 from python_socks import ProxyType
 import asyncio
 import csv
@@ -36,7 +38,7 @@ logger = logging.getLogger('spammer')
 
 
 accounts = [
-    {"api_id": "20600849", "api_hash": "41b4269e451bb95f0a2bfdd61d52947e", "session": "join_groups_1", "name": "Andrey_bot"}#Andrey
+    {"api_id": "20600849", "api_hash": "41b4269e451bb95f0a2bfdd61d52947e", "session": "join_groups_1", "phone_number": "", "name": "Andrey_bot"}#Andrey
     #{"api_id": "23255984", "api_hash": "fca003b16ca72a7ca5ddb6762985e3c2", "session": "session_02", "name": "Angelo_bot"} #Max
 ]
 
@@ -88,6 +90,9 @@ async def join_groups_for_account(account):
                  await asyncio.sleep(3)
                         
         print(f"All requested groups/channels were joined for {account['name']}")
+        await client_1(UpdateProfileRequest(
+            about='@trish_vids'
+        ))
         await asyncio.sleep(2)
         await client_1.disconnect()
     
@@ -197,7 +202,6 @@ async def send_message_from_random_account(chat_id, random_comment, reply_to_mes
                     client.disconnect()
                     await asyncio.sleep(30)
                     break
-
 
 
 @client.on(events.NewMessage(chats=chat_listen_to))
