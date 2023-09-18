@@ -25,15 +25,15 @@ async def connect_to_db():
         print(ex)
         
 
-async def add_id(user_id: int):
+async def add_id(user_id):
     conn = await connect_to_db()
     async with conn.cursor() as cursor:
-        select_query = "SELECT user_id FROM user_ids WHERE user_id = %s"
+        select_query = "SELECT username FROM user_ids WHERE username = %s"
         await cursor.execute(select_query, (user_id,))
         result = await cursor.fetchone()
 
         if result is None:
-            insert_query = "INSERT INTO user_ids (user_id) VALUES (%s)"
+            insert_query = "INSERT INTO user_ids (username) VALUES (%s)"
             await cursor.execute(insert_query, (user_id,))
             await conn.commit()
         else:
@@ -45,7 +45,7 @@ async def add_id(user_id: int):
 async def get_non_processed_users():
     conn = await connect_to_db()
     async with conn.cursor() as cursor:
-        select_query = "SELECT user_id FROM user_ids WHERE status = 0"
+        select_query = "SELECT username FROM user_ids WHERE status = 0"
         await cursor.execute(select_query)
         result = await cursor.fetchall()
     
@@ -57,7 +57,7 @@ async def send_message_to_user(user_id):
     conn = await connect_to_db()
     async with conn.cursor() as cursor:
         try:
-            update_query = "UPDATE user_ids SET status = 1 WHERE user_id = %s"
+            update_query = "UPDATE user_ids SET status = 1 WHERE username = %s"
             await cursor.execute(update_query, (user_id,))
             await conn.commit()
     
