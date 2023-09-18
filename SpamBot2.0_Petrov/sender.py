@@ -8,6 +8,8 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from telethon import TelegramClient, events
 from telethon.errors.rpcerrorlist import PhoneNumberBannedError
+from telethon.tl.types import PeerUser
+from telethon.tl import types
 from configuration import *
 from keyboard import *
 import random
@@ -52,7 +54,7 @@ class CheckSubscriptionUserMiddleware(BaseMiddleware):
                     raise CancelHandler()  
                 
 
-with open('/Users/zgutadenis/Desktop/Work/SpamBot_Petrov/messages.csv', 'r') as file:
+with open('C:\\Users\\admin\\Desktop\\Spammer_2.0\\messages.csv', 'r', encoding='utf-8') as file:
     csvreader = csv.reader(file, delimiter='/')
     for row in csvreader:
         if row:
@@ -92,14 +94,13 @@ async def start_command(message: types.Message) -> None:
 @dp.message_handler(text='Почати розсилку 🧨')
 async def send_start_handler(message: types.Message):
     global message_send, message_failed
-    
     banned_accounts_count = set()
     problem_ids = []
     
     while len(banned_accounts_count) < len(accounts):
         random_account = random.choice(accounts)
         async with client_lock:
-            client = TelegramClient(random_account['session'], random_account['api_id'], random_account['api_hash'])
+            client = TelegramClient(random_account['session'], random_account['api_id'], random_account['api_hash'], proxy=proxy)
             await client.connect()
             try:
                 if not await client.is_user_authorized():
@@ -113,7 +114,7 @@ async def send_start_handler(message: types.Message):
                     break
                 
                 for user in users:
-                    user_id = user['user_id']
+                    user_id = user['username']
         
                     try:
                         if len(comments_used) == len(comments):
@@ -129,9 +130,17 @@ async def send_start_handler(message: types.Message):
                                 await send_message_to_user(user_id)
                                 message_send +=1
                                 
-                                await asyncio.sleep(2)
+                                await asyncio.sleep(3)
                                 break
-                            
+
+                        if message_send >=15:
+                            break
+                        
+                        if message_failed >=8:
+                            await bot.send_message(cha_id=message.chat.id,
+                                                   text="<b>Проблеми з надсиланням!</b>",
+                                                   parse_mode="HTML")
+                            break
                     except Exception as e:
                         print(f"Error sending message to user with user_id {user_id}: {e}")
                         message_failed +=1
@@ -237,7 +246,6 @@ async def banned_check_handler(message: types.Message):
                            reply_markup=keyboard)
 
 
-@dp.message_handler(text='Переглянути БД 📄')
 async def database_check_handler(message: types.Message):
     try:
         posts = await database_check("all")
@@ -253,9 +261,10 @@ async def database_check_handler(message: types.Message):
                 user_info = f"<b>{post['id']} | {post['user_id']} | {post['date_added']} | {post['status']}</b>"
                 response += user_info + "\n"
 
-
+            # Split the response into chunks of 4000 characters
             message_chunks = [response[i:i + 4000] for i in range(0, len(response), 4000)]
 
+            # Send each chunk as a separate message
             for chunk in message_chunks:
                 await bot.send_message(chat_id=message.chat.id,
                                        text=chunk,
@@ -265,7 +274,6 @@ async def database_check_handler(message: types.Message):
         await bot.send_message(chat_id=message.chat.id,
                                text="ERROR",
                                parse_mode="HTML")
-
         print("Unknown mistake, probably with Database!")
 
 
@@ -298,7 +306,7 @@ async def banned_check_completely(callback: types.CallbackQuery):
     choice = callback.data.split('_')[1]
 
     async with client_lock:
-        client = TelegramClient(session, "20600849", "41b4269e451bb95f0a2bfdd61d52947e")
+        client = TelegramClient(session, "20600849", "41b4269e451bb95f0a2bfdd61d52947e", proxy=proxy)
         await client.connect()
         try:
             if not await client.is_user_authorized():
