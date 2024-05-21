@@ -1,7 +1,7 @@
 from python_socks import ProxyType
  
-API_ID = "20600849"
-API_HASH = '41b4269e451bb95f0a2bfdd61d52947e'
+API_ID = ""
+API_HASH = ''
 
 proxy = {
         'proxy_type': ProxyType.SOCKS5,
@@ -29,8 +29,8 @@ telegram_nicknames = [
 
 #{"api_id": "", "api_hash": "", "session": "", "phone_number": "", "name": ""}
 accounts = [
-    {"api_id": "20600849", "api_hash": "41b4269e451bb95f0a2bfdd61d52947e", "session": "main_bot", "phone_number": "+4915161584488", "name": "Den4ik"},
-    {"api_id": "20600849", "api_hash": "41b4269e451bb95f0a2bfdd61d52947e", "session": "telethon1", "phone_number": "+27718504860", "name": "Den4ik_2"}
+    {"api_id": "", "api_hash": "", "session": "main_bot", "phone_number": "", "name": "Den4ik"},
+    {"api_id": "", "api_hash": "", "session": "telethon1", "phone_number": "+27718504860", "name": "Den4ik_2"}
     
 ] 
 
@@ -43,9 +43,9 @@ CONFIGURATION = {
     'DB_USER' : 'root',
     'DB_NAME' : 'user_ids_db',
     'DB_PASSWORD' : 'root1234',
-    'SENDER_EMAIL' : 'stonehaven.reset@gmail.com',
-    'APP_PASSWORD' : 'lfemarbsgejrcfmq',
-    'API_TOKEN' : '6053384973:AAHGLLvlUiz2bekhT5d9MAQoDV8zUTZ2C2Y'
+    'SENDER_EMAIL' : '',
+    'APP_PASSWORD' : '',
+    'API_TOKEN' : ''
 }
 
 STRUCTURED_MESSAGE = """
