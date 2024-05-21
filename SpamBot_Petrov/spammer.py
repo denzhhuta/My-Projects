@@ -38,7 +38,7 @@ logger = logging.getLogger('spammer')
 
 
 accounts = [
-    {"api_id": "20600849", "api_hash": "41b4269e451bb95f0a2bfdd61d52947e", "session": "join_groups_1", "phone_number": "", "name": "Andrey_bot"}#Andrey
+    {"api_id": "", "api_hash": "", "session": "join_groups_1", "phone_number": "", "name": "Andrey_bot"}#Andrey
     #{"api_id": "23255984", "api_hash": "fca003b16ca72a7ca5ddb6762985e3c2", "session": "session_02", "name": "Angelo_bot"} #Max
 ]
 
