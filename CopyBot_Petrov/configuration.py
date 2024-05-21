@@ -15,17 +15,17 @@
 ############################################################
 
 CONFIGURATION = {
-    'TOKEN_API' : '6064195503:AAHdQeQ6LA4T2BPoDTBozkOucEIwCTcliQo',
+    'TOKEN_API' : '',
     'CHANNEL_ID' : '-1001900232820',
-    'API_ID' : '24607193',
-    'API_HASH' : '75e0b0af6c73a423bb12bc1ee0e9c14c',
+    'API_ID' : '',
+    'API_HASH' : '',
     'ID_BOT' : '@copycatpetrov_bot',
     'DB_HOST' : 'localhost',
     'DB_USER' : 'root',
     'DB_NAME' : 'resend_bot',
     'DB_PASSWORD' : 'root1234',
-    'SENDER_EMAIL' : 'stonehaven.reset@gmail.com',
-    'APP_PASSWORD' : 'lfemarbsgejrcfmq'
+    'SENDER_EMAIL' : '',
+    'APP_PASSWORD' : ''
     
 }
 
